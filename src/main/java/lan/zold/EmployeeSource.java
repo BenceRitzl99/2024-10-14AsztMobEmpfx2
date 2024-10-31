@@ -61,6 +61,52 @@ public class EmployeeSource {
         ps.setString(2, employee.getCity());
         ps.setDouble(3, employee.getSalary());
         int records = ps.executeUpdate();
-        System.err.println(records);        
+        System.err.println(records);
+        conn.close();        
+    }
+
+    public void updateEmployee(Employee emp) {
+        try {
+            tryUpdateEmployee(emp);
+        } catch (SQLException e) {
+            System.err.println("Hiba! A dolgozó módosítása nem sikerült!");
+            System.err.println(e.getMessage());
+        }
+    }
+    private void tryUpdateEmployee(Employee emp) throws SQLException {
+        Connection conn = database.connect();
+        String sql = """
+                update employees
+                set
+                name = ?,
+                city = ?,
+                salary = ?
+                where
+                id = ? 
+                """;
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, emp.getName());
+        pstmt.setString(2, emp.getCity());
+        pstmt.setDouble(3, emp.getSalary());
+        pstmt.setInt(4, emp.getId());
+        pstmt.executeUpdate();
+        conn.close();
+    }
+
+    public void deleteEmployee(int id) {
+        try {
+            tryDeleteEmployee(id);
+        } catch (SQLException e) {
+            System.err.println("Hiba! A dolgozó törlése nem sikerült!");
+            System.err.println(e.getMessage());
+        }
+    }
+    private void tryDeleteEmployee(int id) throws SQLException {
+        Connection conn = database.connect();
+        String sql = "delete from employees where id = ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setInt(1, id);
+        pstmt.executeUpdate();
+        conn.close();
     }
 }
